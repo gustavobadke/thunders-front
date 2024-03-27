@@ -1,0 +1,59 @@
+<div class="container">
+  <h1 class="mb-5">Thunders To Do</h1>
+
+  <div *ngIf="isLoading">
+    <p>carregando lista ...</p>
+  </div>
+  <div *ngIf="!isLoading && toDoList.length == 0">
+    <ngb-alert type="info" [dismissible]="false">
+      ainda não há nada para fazer, adiciona o primeiro item abaixo
+    </ngb-alert>
+  </div>
+  <div *ngIf="!isLoading && toDoList.length > 0" class="todo-list">
+    <div *ngFor="let todo of toDoList; index as index">
+      <div *ngIf="todo.mode == itemMode.View">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" [checked]="todo.isDone" id="todo-item-{{ todo.id }}" (click)="toggleDone(index)" >
+          <label class="form-check-label" for="todo-item-{{ todo.id }}">
+            {{ todo.text }} <span *ngIf="todo.deadline" class="text-muted"><small><em>({{ todo.deadline | date:'dd/MM/yyyy' }})</em></small></span>
+          </label>
+          <button class="btn btn-danger btn-sm float-end" (click)="remove(index)">X</button>
+          <button class="btn btn-secondary btn-sm float-end me-1" (click)="edit(index)">editar</button>
+        </div>
+      </div>
+      <div *ngIf="todo.mode == itemMode.Edit">
+        <form #editItemForm="ngForm" (ngSubmit)="update(index, editItemForm)">
+          <div class="row g-3">
+            <div class="col">
+              <input type="text" class="form-control" name="text" ngModel>
+            </div>
+            <div class="col-3">
+              <input type="date" class="form-control" name="deadline" ngModel>
+            </div>
+            <div class="col-auto">
+              <button type="submit" class="btn btn-primary btn-sm me-1">Salvar</button>
+              <button class="btn btn-secondary btn-sm" (click)="cancelEdit(index)">cancelar</button>
+            </div>
+          </div>
+          <p class="text-danger" *ngIf="errors.onUpdate">{{ errors.onUpdate }}</p>
+        </form>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+  <form #newItemForm="ngForm" (ngSubmit)="create(newItemForm)">
+    <div class="row g-3">
+      <div class="col">
+        <input #newItemText type="text" class="form-control" placeholder="novo item" name="text" ngModel>
+      </div>
+      <div class="col-3">
+        <input type="date" class="form-control" placeholder="tempo final" name="deadline" ngModel>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">+</button>
+      </div>
+    </div>
+    <p class="text-danger" *ngIf="errors.onCreate">{{ errors.onCreate }}</p>
+  </form>
+</div>
